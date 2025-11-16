@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CARIOFRIENDS - AR VERSION</title>
+  <link rel="stylesheet" href="./ui.css">
+</head>
+<body>
+  <!-- XR Button -->
+  <button id="xrBtn" class="xr-btn">Enter AR</button>
+
+  <!-- AR canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- UI logic must load BEFORE AR logic so listeners are ready -->
+  <script src="./ui.js"></script>
+
+  <!-- AR logic (module) -->
+  <script type="module" src="./index.js"></script>
+</body>
+</html>
