@@ -19,21 +19,6 @@
   let sweetCount = 0;
   let healthyCount = 0;
 
-  // NEW: sweet stage (0 = no warnings yet, 1..8 progression)
-  let sweetStage = 0;
-
-  // messages for sweet progression (1..8)
-  const SWEET_MESSAGES = [
-    'Peringatan Plak Gigi\n\n“Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!”',
-    'Plak Gigi (Tetap Diingatkan)\n\n“Plaknya makin banyak nih… ayo jangan sering makan permen!”',
-    'Peringatan Asam Laktat\n\n“Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!”',
-    'Asam Laktat (Tetap Diingatkan)\n\n“Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!”',
-    'Peringatan Demineralisasi Email\n\n“Lapisan luar gigi mulai melemah, jangan tambah permennya ya!”',
-    'Demineralisasi Email (Tetap Diingatkan)\n\n“Email gigi makin rapuh… yuk hentikan sebelum bolong!”',
-    'Peringatan Karies Gigi\n\n“Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!”',
-    'Karies Gigi Parah – Harus Reset\n\n“Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!”'
-  ];
-
   // initially action buttons disabled until model placed
   function setButtonsEnabled(enabled) {
     buttons.forEach(b => {
@@ -56,7 +41,6 @@
     if (!info) return;
     info.style.opacity = 0;
     setTimeout(() => {
-      // preserve newlines visually by using textContent (keeps plain text) and rely on CSS line-height
       info.textContent = text;
       info.style.opacity = 1;
     }, 160);
@@ -77,11 +61,6 @@
       const action = btn.dataset.action;
       if (!toothReady) {
         fadeInfo("Model belum siap. Arahkan kamera & tunggu model muncul.");
-        return;
-      }
-      // if tooth reached terminal (sweetStage 8), block sweet/other actions until reset
-      if (sweetStage >= 8) {
-        fadeInfo("⚠️ Gigi sudah rusak parah — tekan Reset untuk mulai ulang.");
         return;
       }
       // request AR to run interactor anim; UI locks buttons until 'interactor-finished'
@@ -119,8 +98,7 @@
       fadeInfo(status === 'skipped' ? "Animasi tidak dijalankan." : "Terjadi error animasi.");
       // re-enable unless terminal; index.js or other logic may emit health-changed next
       setTimeout(() => {
-        // if terminal reached via sweetStage we leave disabled until reset
-        if (sweetStage < 8) setButtonsEnabled(true);
+        setButtonsEnabled(true);
       }, 300);
       return;
     }
@@ -132,16 +110,10 @@
     updateBars();
     window.dispatchEvent(new CustomEvent('health-changed', { detail: { health: healthValue, clean: cleanValue } }));
 
-    // check terminal condition (either numeric or sweetStage 8)
-    if ((cleanValue <= 0 && healthValue <= 0) || sweetStage >= 8) {
+    // check terminal condition
+    if (cleanValue <= 0 && healthValue <= 0) {
       setButtonsEnabled(false);
-      toothReady = (sweetStage >= 8) ? false : toothReady;
-      if (sweetStage >= 8) {
-        // explicit final message (already shown in performActionEffect) but ensure clarity
-        fadeInfo("⚠️ Gigi sudah rusak parah — tekan Reset untuk mulai ulang.");
-      } else {
-        fadeInfo("⚠️ Gigi sudah rusak parah — struktur rusak. Perawatan akhir diperlukan (di dunia nyata).");
-      }
+      fadeInfo("⚠️ Gigi sudah rusak parah — struktur rusak. Perawatan akhir diperlukan (di dunia nyata).");
       // keep Enter AR handled by xr-ended when session ends
     } else {
       setButtonsEnabled(true);
@@ -192,32 +164,55 @@
         fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
         break;
       case 'sweet':
-        // advance sweet stage (unless already terminal)
-        if (sweetStage < 8) sweetStage++;
+  // naikan tahap manis (1..8)
+  if (sweetStage < 8) sweetStage++;
 
-        // numeric effects remain similar to previous behavior
-        cleanValue = clamp100(cleanValue - 12.5);
-        sweetCount++;
-        if (sweetCount >= 2) {
-          sweetCount = 0;
-          healthValue = clamp100(healthValue - 25);
-        }
+  // efek numerik normal
+  cleanValue = clamp100(cleanValue - 12.5);
+  sweetCount++;
 
-        // show the stage-specific message (user-provided text)
-        const idx = sweetStage - 1;
-        if (idx >= 0 && idx < SWEET_MESSAGES.length) {
-          fadeInfo(SWEET_MESSAGES[idx]);
-        } else {
-          // fallback
-          fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
-        }
+  if (sweetCount >= 2) {
+    sweetCount = 0;
+    healthValue = clamp100(healthValue - 25);
+  }
 
-        // if reached final stage, lock further actions until reset
-        if (sweetStage >= 8) {
-          setButtonsEnabled(false);
-          toothReady = false;
-        }
-        break;
+  // 8 pesan berurutan
+  switch (sweetStage) {
+    case 1:
+      fadeInfo("Peringatan Plak Gigi\n\n“Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!”");
+      break;
+    case 2:
+      fadeInfo("Plak Gigi (Tetap Diingatkan)\n\n“Plaknya makin banyak nih… ayo jangan sering makan permen!”");
+      break;
+    case 3:
+      fadeInfo("Peringatan Asam Laktat\n\n“Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!”");
+      break;
+    case 4:
+      fadeInfo("Asam Laktat (Tetap Diingatkan)\n\n“Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!”");
+      break;
+    case 5:
+      fadeInfo("Peringatan Demineralisasi Email\n\n“Lapisan luar gigi mulai melemah, jangan tambah permennya ya!”");
+      break;
+    case 6:
+      fadeInfo("Demineralisasi Email (Tetap Diingatkan)\n\n“Email gigi makin rapuh… yuk hentikan sebelum bolong!”");
+      break;
+    case 7:
+      fadeInfo("Peringatan Karies Gigi\n\n“Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!”");
+      break;
+    case 8:
+      fadeInfo("Karies Gigi Parah – Harus Reset\n\n“Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!”");
+
+      // Jika sudah tahap 8 → kunci tombol agar harus reset
+      setButtonsEnabled(false);
+      toothReady = false;
+      break;
+
+    default:
+      fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
+  }
+
+  break;
+
       case 'healthy':
         cleanValue = clamp100(cleanValue + 12.5);
         healthyCount++;
@@ -240,7 +235,6 @@
     healthValue = 100;
     sweetCount = 0;
     healthyCount = 0;
-    sweetStage = 0;
     toothReady = false;
     setButtonsEnabled(false);
     updateBars();
@@ -252,7 +246,7 @@
     setButtonsEnabled,
     updateBars,
     fadeInfo,
-    _getState: () => ({ cleanValue, healthValue, sweetCount, healthyCount, sweetStage })
+    _getState: () => ({ cleanValue, healthValue, sweetCount, healthyCount })
   };
 
   // initial UI
