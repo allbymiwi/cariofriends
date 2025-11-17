@@ -19,6 +19,7 @@
   let toothStage = 0;
   let sweetCount = 0;
   let healthyCount = 0;
+  let lastAction = null;
 
   // initially action buttons disabled until model placed
   function setButtonsEnabled(enabled) {
@@ -161,57 +162,96 @@
       case 'brush':
         cleanValue = clamp100(cleanValue + 25);
         healthValue = clamp100(healthValue + 25);
-
-        sweetCount = 0; 
+        sweetCount = 0;
         healthyCount = 0;
-        fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
+        // jangan reset toothStage — tetap di tahap sebelumnya
+        fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25!");
+        lastAction = 'brush';
         break;
-            case 'sweet':
-        // setiap tekan mengurangi kebersihan sedikit
+
+        
+      case 'sweet': {
+        // kebersihan selalu turun 12.5 (langsung)
         cleanValue = clamp100(cleanValue - 12.5);
 
-        // pastikan toothStage terdefinisi
-        toothStage = (typeof toothStage === 'number') ? toothStage : 0;
-
-        // naik satu tahap per tekan, maksimal 8
+        // naik tahap visual/cerita
         if (toothStage < 8) toothStage++;
 
-        // sesuaikan health setiap 2 tahap supaya model berganti pada 75/50/25/0
-        // stage 1 -> health 100, 2 -> 75, 3 -> 75, 4 -> 50, 5 -> 50, 6 -> 25, 7 -> 25, 8 -> 0
-        const healthDrops = Math.floor(toothStage / 2); // 0..4
-        healthValue = clamp100(100 - (healthDrops * 25));
-
-        // tampilkan pesan sesuai tahap (urutan yang kamu minta)
-        switch (toothStage) {
-          case 1:
-            fadeInfo("Wah, gulanya nempel di gigimu! Hati-hati ya, nanti bisa muncul plak.");
-            break;
-          case 2:
-            fadeInfo("Plaknya makin banyak nih… Yuk kurangi permennya supaya gigimu tetap bersih!");
-            break;
-          case 3:
-            fadeInfo("Plaknya berubah jadi asam yang bisa bikin gigi sakit, hati-hati ya!");
-            break;
-          case 4:
-            fadeInfo("Asamnya makin kuat… nanti gigimu bisa rusak kalau terus makan manis!");
-            break;
-          case 5:
-            fadeInfo("Lapisan pelindung gigimu mulai melemah. Yuk berhenti makan permen dulu!");
-            break;
-          case 6:
-            fadeInfo("Pelindung gigimu makin rapuh… ayo jaga sebelum bolong beneran!");
-            break;
-          case 7:
-            fadeInfo("Aduh, gigimu mulai bolong! Bisa bahaya, kurangi manisnya ya!");
-            break;
-          case 8:
-            fadeInfo("Giginya sudah bolong besar dan nggak bisa diperbaiki… Harus mulai ulang dari awal ya!");
-            // (opsional) set kondisi terminal / disable tombol — UI lain sudah cek health<=0
-            break;
-          default:
-            fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
+        // Jika aksi sebelumnya adalah 'brush', maka pada sweet pertama
+        // setelah brush kita TIDAK menyentuh health — hanya clean berkurang.
+        // Pada sweet berikutnya (atau jika prevAction != 'brush'), health
+        // "mengejar" clean: kita set health = min(health, clean)
+        if (lastAction === 'brush') {
+          // hanya update pesan sesuai tahap — health tidak berubah di sini
+          switch (toothStage) {
+            case 1:
+              fadeInfo("Gulanya nempel di gigimu! Hati-hati ya!");
+              break;
+            case 2:
+              fadeInfo("Plaknya makin banyak nih… yuk kurangi permennya!");
+              break;
+            case 3:
+              fadeInfo("Plaknya berubah jadi asam yang bisa membuat gigi rusak!");
+              break;
+            case 4:
+              fadeInfo("Asamnya makin kuat… hati-hati ya!");
+              break;
+            case 5:
+              fadeInfo("Lapisan luar gigi mulai melemah, jangan tambah permennya ya!");
+              break;
+            case 6:
+              fadeInfo("Email gigi makin rapuh… yuk hentikan sebelum bolong!");
+              break;
+            case 7:
+              fadeInfo("Gigi mulai bolong kecil! Kurangi manisnya!");
+              break;
+            case 8:
+              fadeInfo("Gigi sudah bolong besar… saatnya mulai ulang ya!");
+              break;
+            default:
+              fadeInfo("🍭 Gula menempel — kebersihan menurun.");
+          }
+        } else {
+          // bukan sweet pertama setelah brush => turunkan health sampai sejajar clean
+          if (healthValue > cleanValue) {
+            healthValue = clamp100(cleanValue);
+          }
+          // pesan sesuai tahap
+          switch (toothStage) {
+            case 1:
+              fadeInfo("Gulanya nempel di gigimu! Hati-hati ya!");
+              break;
+            case 2:
+              fadeInfo("Plaknya makin banyak nih… yuk kurangi permennya!");
+              break;
+            case 3:
+              fadeInfo("Plaknya berubah jadi asam yang bisa membuat gigi rusak!");
+              break;
+            case 4:
+              fadeInfo("Asamnya makin kuat… hati-hati ya!");
+              break;
+            case 5:
+              fadeInfo("Lapisan luar gigi mulai melemah, jangan tambah permennya ya!");
+              break;
+            case 6:
+              fadeInfo("Email gigi makin rapuh… yuk hentikan sebelum bolong!");
+              break;
+            case 7:
+              fadeInfo("Gigi mulai bolong kecil! Kurangi manisnya!");
+              break;
+            case 8:
+              fadeInfo("Gigi sudah bolong besar… saatnya mulai ulang ya!");
+              break;
+            default:
+              fadeInfo("🍭 Gula menempel — kebersihan menurun.");
+          }
         }
+
+        // catat bahwa aksi terakhir sekarang 'sweet'
+        lastAction = 'sweet';
         break;
+      }
+
 
       case 'healthy':
         cleanValue = clamp100(cleanValue + 12.5);
@@ -237,6 +277,7 @@
     sweetCount = 0;
     healthyCount = 0;
     toothStage = 0;
+    lastAction = null;
     toothReady = false;
     setButtonsEnabled(false);
     updateBars();
