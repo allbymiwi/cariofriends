@@ -16,6 +16,7 @@
   let healthValue = 100;
 
   // counters for repeated actions
+  let toothStage = 0;
   let sweetCount = 0;
   let healthyCount = 0;
 
@@ -163,72 +164,52 @@
         sweetCount = 0; healthyCount = 0;
         fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
         break;
-      case 'sweet':
-  cleanValue = clamp100(cleanValue - 12.5);
-  sweetCount++;
+            case 'sweet':
+        // setiap tekan mengurangi kebersihan sedikit
+        cleanValue = clamp100(cleanValue - 12.5);
 
-  // Tahap kerusakan gigi (0–7)
-  // 0: plak_warning
-  // 1: plak_repeat
-  // 2: acid_warning
-  // 3: acid_repeat
-  // 4: demineral_warning
-  // 5: demineral_repeat
-  // 6: caries_warning
-  // 7: caries_reset
-  toothStage = (toothStage || 0);
+        // pastikan toothStage terdefinisi
+        toothStage = (typeof toothStage === 'number') ? toothStage : 0;
 
-  if (sweetCount >= 2) {
-    sweetCount = 0;
-    healthValue = clamp100(healthValue - 25);
+        // naik satu tahap per tekan, maksimal 8
+        if (toothStage < 8) toothStage++;
 
-    // Naik tahap kerusakan gigi
-    if (toothStage < 7) toothStage++;
+        // sesuaikan health setiap 2 tahap supaya model berganti pada 75/50/25/0
+        // stage 1 -> health 100, 2 -> 75, 3 -> 75, 4 -> 50, 5 -> 50, 6 -> 25, 7 -> 25, 8 -> 0
+        const healthDrops = Math.floor(toothStage / 2); // 0..4
+        healthValue = clamp100(100 - (healthDrops * 25));
 
-    switch (toothStage) {
-      case 1:
-        fadeInfo("Plaknya makin banyak nih… ayo jangan sering makan permen!");
+        // tampilkan pesan sesuai tahap (urutan yang kamu minta)
+        switch (toothStage) {
+          case 1:
+            fadeInfo("Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!");
+            break;
+          case 2:
+            fadeInfo("Plaknya makin banyak nih… ayo jangan sering makan permen!");
+            break;
+          case 3:
+            fadeInfo("Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!");
+            break;
+          case 4:
+            fadeInfo("Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!");
+            break;
+          case 5:
+            fadeInfo("Lapisan luar gigi mulai melemah, jangan tambah permennya ya!");
+            break;
+          case 6:
+            fadeInfo("Email gigi makin rapuh… yuk hentikan sebelum bolong!");
+            break;
+          case 7:
+            fadeInfo("Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!");
+            break;
+          case 8:
+            fadeInfo("Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!");
+            // (opsional) set kondisi terminal / disable tombol — UI lain sudah cek health<=0
+            break;
+          default:
+            fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
+        }
         break;
-
-      case 3:
-        fadeInfo("Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!");
-        break;
-
-      case 5:
-        fadeInfo("Email gigi makin rapuh… yuk hentikan sebelum bolong!");
-        break;
-
-      case 7:
-        fadeInfo("Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!");
-        // reset logic di sini
-        break;
-    }
-
-  } else {
-    // Notifikasi pertama kali tiap tahap (warning)
-    switch (toothStage) {
-      case 0:
-        fadeInfo("Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!");
-        break;
-
-      case 2:
-        fadeInfo("Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!");
-        break;
-
-      case 4:
-        fadeInfo("Lapisan luar gigi mulai melemah, jangan tambah permennya ya!");
-        break;
-
-      case 6:
-        fadeInfo("Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!");
-        break;
-
-      default:
-        fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
-    }
-  }
-
-  break;
 
       case 'healthy':
         cleanValue = clamp100(cleanValue + 12.5);
