@@ -19,7 +19,6 @@
   let toothStage = 0;
   let sweetCount = 0;
   let healthyCount = 0;
-  let lastAction = null;
 
   // initially action buttons disabled until model placed
   function setButtonsEnabled(enabled) {
@@ -162,12 +161,12 @@
       case 'brush':
         cleanValue = clamp100(cleanValue + 25);
         healthValue = clamp100(healthValue + 25);
-
         sweetCount = 0; 
-        healthyCount = 0;
+        healthyCount = 0; 
+        toothStage = 0;
         fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
         break;
-        case 'sweet':
+            case 'sweet':
         // setiap tekan mengurangi kebersihan sedikit
         cleanValue = clamp100(cleanValue - 12.5);
 
