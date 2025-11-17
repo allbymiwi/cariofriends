@@ -161,9 +161,7 @@
       case 'brush':
         cleanValue = clamp100(cleanValue + 25);
         healthValue = clamp100(healthValue + 25);
-        sweetCount = 0; 
-        healthyCount = 0; 
-        toothStage = 0;
+        sweetCount = 0; healthyCount = 0; toothStage = 0;
         fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
         break;
             case 'sweet':
@@ -218,7 +216,6 @@
         healthyCount++;
         if (healthyCount >= 2) {
           healthyCount = 0;
-          toothStage = 0;
           healthValue = clamp100(healthValue + 25);
           fadeInfo("🥦 Makanan sehat membantu — kesehatan naik 25%!");
         } else {
