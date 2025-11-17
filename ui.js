@@ -233,6 +233,7 @@
     healthValue = 100;
     sweetCount = 0;
     healthyCount = 0;
+    toothStage = 0;
     toothReady = false;
     setButtonsEnabled(false);
     updateBars();
