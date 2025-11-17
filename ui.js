@@ -164,54 +164,40 @@
         fadeInfo("🪥 Menggosok gigi: Kebersihan +25%, Kesehatan +25%");
         break;
       case 'sweet':
-  // naikan tahap manis (1..8)
-  if (sweetStage < 8) sweetStage++;
+    // --- naikkan tahap permen (1..8) ---
+    if (sweetStage < 8) sweetStage++;
 
-  // efek numerik normal
-  cleanValue = clamp100(cleanValue - 12.5);
-  sweetCount++;
+    // --- tampilkan pesan sesuai tahap ---
+    switch (sweetStage) {
+      case 1:
+        fadeInfo("Peringatan Plak Gigi\n\n“Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!”");
+        break;
+      case 2:
+        fadeInfo("Plak Gigi (Tetap Diingatkan)\n\n“Plaknya makin banyak nih… ayo jangan sering makan permen!”");
+        break;
+      case 3:
+        fadeInfo("Peringatan Asam Laktat\n\n“Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!”");
+        break;
+      case 4:
+        fadeInfo("Asam Laktat (Tetap Diingatkan)\n\n“Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!”");
+        break;
+      case 5:
+        fadeInfo("Peringatan Demineralisasi Email\n\n“Lapisan luar gigi mulai melemah, jangan tambah permennya ya!”");
+        break;
+      case 6:
+        fadeInfo("Demineralisasi Email (Tetap Diingatkan)\n\n“Email gigi makin rapuh… yuk hentikan sebelum bolong!”");
+        break;
+      case 7:
+        fadeInfo("Peringatan Karies Gigi\n\n“Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!”");
+        break;
+      case 8:
+        fadeInfo("Karies Gigi Parah – Harus Reset\n\n“Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!”");
+        break;
+    }
 
-  if (sweetCount >= 2) {
-    sweetCount = 0;
-    healthValue = clamp100(healthValue - 25);
-  }
-
-  // 8 pesan berurutan
-  switch (sweetStage) {
-    case 1:
-      fadeInfo("Peringatan Plak Gigi\n\n“Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!”");
-      break;
-    case 2:
-      fadeInfo("Plak Gigi (Tetap Diingatkan)\n\n“Plaknya makin banyak nih… ayo jangan sering makan permen!”");
-      break;
-    case 3:
-      fadeInfo("Peringatan Asam Laktat\n\n“Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!”");
-      break;
-    case 4:
-      fadeInfo("Asam Laktat (Tetap Diingatkan)\n\n“Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!”");
-      break;
-    case 5:
-      fadeInfo("Peringatan Demineralisasi Email\n\n“Lapisan luar gigi mulai melemah, jangan tambah permennya ya!”");
-      break;
-    case 6:
-      fadeInfo("Demineralisasi Email (Tetap Diingatkan)\n\n“Email gigi makin rapuh… yuk hentikan sebelum bolong!”");
-      break;
-    case 7:
-      fadeInfo("Peringatan Karies Gigi\n\n“Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!”");
-      break;
-    case 8:
-      fadeInfo("Karies Gigi Parah – Harus Reset\n\n“Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!”");
-
-      // Jika sudah tahap 8 → kunci tombol agar harus reset
-      setButtonsEnabled(false);
-      toothReady = false;
-      break;
-
-    default:
-      fadeInfo("🍭 Gula menempel — kebersihan sedikit menurun.");
-  }
-
-  break;
+    // --- logika asli kamu tetap dipertahankan ---
+    cleanValue = clamp100(cleanValue - 12.5);
+    sweetCount++;
 
       case 'healthy':
         cleanValue = clamp100(cleanValue + 12.5);
