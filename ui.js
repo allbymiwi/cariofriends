@@ -182,28 +182,28 @@
         // tampilkan pesan sesuai tahap (urutan yang kamu minta)
         switch (toothStage) {
           case 1:
-            fadeInfo("Gulanya nempel di gigi dan mulai bikin plak, hati-hati ya!");
+            fadeInfo("Wah, gulanya nempel di gigimu! Hati-hati ya, nanti bisa muncul plak.");
             break;
           case 2:
-            fadeInfo("Plaknya makin banyak nih… ayo jangan sering makan permen!");
+            fadeInfo("Plaknya makin banyak nih… Yuk kurangi permennya supaya gigimu tetap bersih!");
             break;
           case 3:
-            fadeInfo("Plak berubah jadi asam yang bisa merusak gigi, hati-hati ya!");
+            fadeInfo("Plaknya berubah jadi asam yang bisa bikin gigi sakit, hati-hati ya!");
             break;
           case 4:
-            fadeInfo("Asamnya makin kuat… gigi bisa mulai rusak kalau terus begini!");
+            fadeInfo("Asamnya makin kuat… nanti gigimu bisa rusak kalau terus makan manis!");
             break;
           case 5:
-            fadeInfo("Lapisan luar gigi mulai melemah, jangan tambah permennya ya!");
+            fadeInfo("Lapisan pelindung gigimu mulai melemah. Yuk berhenti makan permen dulu!");
             break;
           case 6:
-            fadeInfo("Email gigi makin rapuh… yuk hentikan sebelum bolong!");
+            fadeInfo("Pelindung gigimu makin rapuh… ayo jaga sebelum bolong beneran!");
             break;
           case 7:
-            fadeInfo("Gigi mulai bolong kecil! Ini sudah berbahaya, kurangi manisnya!");
+            fadeInfo("Aduh, gigimu mulai bolong! Bisa bahaya, kurangi manisnya ya!");
             break;
           case 8:
-            fadeInfo("Giginya sudah bolong besar dan nggak bisa diselamatkan… harus mulai ulang ya!");
+            fadeInfo("Giginya sudah bolong besar dan nggak bisa diperbaiki… Harus mulai ulang dari awal ya!");
             // (opsional) set kondisi terminal / disable tombol — UI lain sudah cek health<=0
             break;
           default:
